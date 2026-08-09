@@ -13,7 +13,7 @@ WORKDIR /app
 COPY package-lock.json package.json ./
 COPY apps ./apps
 
-# Install dependencies
+# Install dependencies from the inherited workspace lockfile
 RUN npm install
 
 # Copy project files and folders to the current working directory (i.e. '/app')
@@ -29,6 +29,7 @@ COPY --from=umbrel-electrumx-builder /app /app
 
 # Change directory to '/app' 
 WORKDIR /app
+USER node
 
-EXPOSE 3007
+EXPOSE 3008
 CMD [ "npm", "run", "dev:backend" ]

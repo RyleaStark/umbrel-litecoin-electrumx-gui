@@ -3,9 +3,9 @@
     <electrumx-header></electrumx-header>
     <div class="flex justify-end mb-2">
       <h3 class="font-semibold mb-0 text-gray-800 dark:text-gray-200">
-        <!-- Case 1: Bitcoin Node still syncing -->
+        <!-- Case 1: Litecoin Core still syncing -->
         <span v-if="syncPercent === -1" class="animate-pulse">
-          Waiting for Bitcoin Node to finish syncing...
+          Waiting for Litecoin Core to finish syncing...
         </span>
         <!-- Case 2: Normal sync progress -->
         <span v-else-if="syncPercent >= 0">
@@ -20,7 +20,7 @@
     </div>
     <progress-bar
       :percentage="progressBarPercentage"
-      colorClass="bg-green-400"
+      colorClass="bg-umbrel"
       class="h-2"
     ></progress-bar>
     <connection-information></connection-information>

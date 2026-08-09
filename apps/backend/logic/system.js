@@ -9,7 +9,7 @@ async function getElectrumConnectionDetails() {
     const torConnectionString = `${torAddress}:${port}:t`;
 
     const localAddress = constants.ELECTRUM_LOCAL_SERVICE;
-    const localConnectionString = `${torAddress}:${port}:t`;
+    const localConnectionString = `${localAddress}:${port}:t`;
 
     return {
       tor: {
@@ -24,8 +24,7 @@ async function getElectrumConnectionDetails() {
       },
     };
   } catch (error) {
-    console.log("error: ", error);
-    throw new NodeError("Unable to get Electrum hidden service url");
+    throw new NodeError("Unable to get Electrum connection details");
   }
 }
 

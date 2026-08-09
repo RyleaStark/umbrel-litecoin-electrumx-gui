@@ -18,7 +18,7 @@
         </svg>
         <p class="ml-1 text-green-400 text-lg">Running</p>
       </div>
-      <h3 class="text-4xl sm:text-5xl font-semibold  dark:text-white">ElectrumX</h3>
+      <h3 class="text-4xl sm:text-5xl font-semibold  dark:text-white">ElectrumX (LTC)</h3>
       <span class="text-sm text-gray-500 font-medium">{{
         version ? `v${version}` : "..."
       }}</span>

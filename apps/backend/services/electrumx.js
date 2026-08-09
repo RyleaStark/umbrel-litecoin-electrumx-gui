@@ -36,20 +36,20 @@ async function getVersion() {
 
 async function syncPercent() {
   try {
-    // If Bitcoin node is still syncing, we return -1 and render the "Waiting for Bitcoin Node to finish syncing..." message on the frontend
-    // This way, the sync percent is not calculated until the Bitcoin node is done syncing
+    // If Litecoin Core is still syncing, return -1 and wait before calculating
+    // ElectrumX's index progress.
     const {
       result: bitcoindResponse
     } = await bitcoindService.getBlockChainInfo();
-    console.log('bitcoindResponse', bitcoindResponse);
+
     if (bitcoindResponse.initialblockdownload) {
       return -1;
     }
 
     const info = await electrumClient.request('getinfo');
-    console.log('electrumx getinfo', info);
+
     const dbHeight = info['db height']; // ElectrumX height
-    const daemonHeight = info['daemon height']; // Bitcoin node height
+    const daemonHeight = info['daemon height']; // Litecoin Core height
 
     return Math.ceil((dbHeight / daemonHeight) * 100);
   } catch (error) {

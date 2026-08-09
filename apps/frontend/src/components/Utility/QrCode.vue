@@ -4,11 +4,11 @@
     :style="{ width: `${size}px`, height: `${size}px` }"
     @click="$emit('click')"
   >
-    <!-- Popup umbrel logo in the middle of QR code -->
+    <!-- Popup ElectrumX (LTC) logo in the middle of the QR code -->
     <transition name="qr-logo-popup" appear>
       <img
         v-show="showLogo"
-        src="@/assets/umbrel-qr-icon.svg"
+        src="@/assets/icon.svg"
         class="qr-logo"
       />
     </transition>
@@ -55,7 +55,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// Transition for umbrel logo popping up on QR
+// Transition for the ElectrumX (LTC) logo popping up on QR
 .qr-logo-popup-enter-active,
 .qr-logo-popup-leave-active {
   &.qr-logo {

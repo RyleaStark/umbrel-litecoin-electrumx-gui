@@ -75,7 +75,7 @@ export default {
     },
   },
   created() {
-    document.title = "ElectrumX - Umbrel";
+    document.title = "ElectrumX (LTC) - Umbrel";
   },
   watch: {
     loading: {

@@ -2,7 +2,7 @@
   <div class="mt-16">
     <p class="mb-1 text-neutral-900 dark:text-neutral-300 text-lg">
       Use the following details to connect your wallet or application to
-      ElectrumX.
+      ElectrumX for Litecoin.
     </p>
     <p class="mb-8 text-sm text-neutral-600 dark:text-neutral-400">
       Connections will only be available once ElectrumX has completed syncing.
@@ -128,9 +128,8 @@
         class="mt-12 text-neutral-900 dark:text-neutral-300 text-lg whitespace-normal"
       >
         Looking for step-by-step instructions to connect your wallet to
-        ElectrumX?
-        <!-- TODO: Update this link when support site is live -->
-        <a class="underline" href="https://community.umbrel.com/t/guide-connect-umbrel-to-your-wallet/7653" target="_blank">Click here</a>.
+        ElectrumX (LTC)? Use these details in an Electrum-compatible Litecoin wallet,
+        such as Electrum-LTC.
       </p>
     </div>
   </div>
