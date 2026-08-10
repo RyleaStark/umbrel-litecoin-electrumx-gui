@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 export function ConnectionQr({ value }: { value: string }) {
   const [source, setSource] = useState<string | null>(null);
-  const hideBadge = value.length > 48;
 
   useEffect(() => {
     let active = true;
@@ -24,7 +23,7 @@ export function ConnectionQr({ value }: { value: string }) {
       {source
         ? <img src={source} alt={`QR code for ${value}`} />
         : <div className="qr-placeholder" aria-label="Generating QR code" />}
-      <span className={`qr-brand${hideBadge ? " qr-brand-hidden" : ""}`} aria-hidden="true"><img src="/icon.png" alt="" /></span>
+      <span className="qr-brand" aria-hidden="true"><img src="/icon.png" alt="" /></span>
     </div>
   );
 }

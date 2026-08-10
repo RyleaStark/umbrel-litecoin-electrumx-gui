@@ -270,7 +270,6 @@ button { color: inherit; }
 .connection-qr > img:first-child { width: 100%; height: 100%; }
 .qr-placeholder { width: 196px; height: 196px; margin: 2px; border-radius: 8px; background: rgb(255 255 255 / 5%); }
 .qr-brand { position: absolute; top: 50%; left: 50%; display: grid; width: 50px; height: 50px; transform: translate(-50%, -50%); border-radius: 9px; padding: 7px; place-items: center; background: #1c1c1c; box-shadow: 0 4px 18px rgb(0 0 0 / 35%); }
-.qr-brand-hidden { display: none; }
 .qr-brand img { width: 100%; height: 100%; border-radius: 7px; }
 .connection-details-column { display: flex; width: 100%; min-width: 0; flex-direction: column; gap: 14px; }
 .connection-field-group { width: 100%; min-width: 0; overflow: hidden; border-radius: 12px; background: linear-gradient(180deg, var(--detail-top), var(--detail-bottom)); }
