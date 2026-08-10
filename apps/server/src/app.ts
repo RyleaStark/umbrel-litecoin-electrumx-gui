@@ -30,9 +30,12 @@ export function buildApp({ service, serveUi = true }: { service: ElectrumXGuiSer
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         frameAncestors: ["'none'"],
+        upgradeInsecureRequests: null,
       },
     },
     crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    originAgentCluster: false,
   });
 
   app.addHook("onRequest", async (request, reply) => {

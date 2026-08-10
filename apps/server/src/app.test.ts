@@ -31,6 +31,9 @@ describe("ElectrumX API", () => {
     expect(response.headers["content-security-policy"]).toContain("frame-ancestors 'none'");
     expect(response.headers["content-security-policy"]).toContain("style-src 'self' 'unsafe-inline'");
     expect(response.headers["content-security-policy"]).toContain("script-src 'self'");
+    expect(response.headers["content-security-policy"]).not.toContain("upgrade-insecure-requests");
+    expect(response.headers["cross-origin-opener-policy"]).toBeUndefined();
+    expect(response.headers["origin-agent-cluster"]).toBeUndefined();
     expect(response.headers["access-control-allow-origin"]).toBe("*");
   });
 
