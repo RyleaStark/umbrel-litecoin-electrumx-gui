@@ -199,15 +199,9 @@ button { color: inherit; }
   box-shadow: 0 0 28px rgb(19 119 231 / 12%), inset 0 1px rgb(255 255 255 / 8%);
 }
 .index-art.is-syncing .index-block {
-  animation: index-block-pulse 2.4s ease-in-out infinite;
+  animation: index-progress-pulse 2.4s ease-in-out infinite;
   animation-delay: calc(var(--pulse-index) * 120ms);
 }
-.index-art.is-syncing .index-block:nth-child(1) { --pulse-index: 0; }
-.index-art.is-syncing .index-block:nth-child(2) { --pulse-index: 1; }
-.index-art.is-syncing .index-block:nth-child(3) { --pulse-index: 2; }
-.index-art.is-syncing .index-block:nth-child(4) { --pulse-index: 3; }
-.index-art.is-syncing .index-block:nth-child(5) { --pulse-index: 4; }
-.index-art.is-syncing .index-block:nth-child(6) { --pulse-index: 5; }
 .index-art.is-complete .index-block {
   border-color: var(--brand);
   background: var(--brand);
@@ -325,14 +319,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dialog-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes loading { from { transform: translateX(-20%); } to { transform: translateX(160%); } }
-@keyframes index-block-pulse {
+@keyframes index-progress-pulse {
   0%, 42%, 100% {
     transform: translateY(var(--block-y)) scale(1);
     filter: brightness(1);
   }
   14% {
     transform: translateY(var(--block-y)) scale(1.055);
-    filter: brightness(1.55);
+    filter: brightness(1.65);
     border-color: rgb(19 119 231 / 72%);
     background: linear-gradient(145deg, rgb(19 119 231 / 42%), rgb(19 119 231 / 12%));
     box-shadow: 0 0 30px rgb(19 119 231 / 24%), inset 0 1px rgb(255 255 255 / 14%);
@@ -377,5 +371,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  .index-art .index-block { transform: none !important; animation: none !important; }
+  .index-art .index-block { transform: none !important; filter: none !important; animation: none !important; }
 }

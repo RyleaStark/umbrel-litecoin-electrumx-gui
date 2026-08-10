@@ -1,4 +1,5 @@
 import type { IndexerStatus } from "@contracts/status";
+import type { CSSProperties } from "react";
 
 const runtimeLabels: Record<IndexerStatus["state"], string> = {
   "waiting-for-core": "Waiting for Litecoin Core",
@@ -40,7 +41,11 @@ export function StatusHero({ status }: { status: IndexerStatus }) {
 
           <div className={`index-art${artState}`} aria-hidden="true">
             {Array.from({ length: 6 }, (_, index) => (
-              <span className={`index-block${index < indexedBlocks ? " is-indexed" : ""}`} key={index} />
+              <span
+                className={`index-block${index < indexedBlocks ? " is-indexed" : ""}`}
+                key={index}
+                style={{ "--pulse-index": index } as CSSProperties}
+              />
             ))}
           </div>
 

@@ -16,6 +16,14 @@ describe("StatusHero", () => {
     expect(container.querySelectorAll(".index-block")).toHaveLength(6);
   });
 
+  it("assigns each indexing block an inline progressive pulse index", () => {
+    const { container } = render(<StatusHero status={{ state: "indexing", version: "2.0.0", coreHeight: 101, indexedHeight: 2, percent: 2.8, message: "Indexing Litecoin blocks" }} />);
+    const blocks = Array.from(container.querySelectorAll<HTMLElement>(".index-block"));
+
+    expect(blocks).toHaveLength(6);
+    expect(blocks.map((block) => block.style.getPropertyValue("--pulse-index"))).toEqual(["0", "1", "2", "3", "4", "5"]);
+  });
+
   it("marks all six blocks solid and complete only when ready", () => {
     const { container } = render(<StatusHero status={{ state: "ready", version: "2.0.0", coreHeight: 101, indexedHeight: 101, percent: 100, message: "ElectrumX is synchronized" }} />);
     expect(container.querySelector(".index-art")).toHaveClass("is-complete");
