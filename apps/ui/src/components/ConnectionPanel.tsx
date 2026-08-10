@@ -1,20 +1,33 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tabs from "@radix-ui/react-tabs";
+import copyToClipboard from "copy-to-clipboard";
 import { Check, Copy, WalletCards, X } from "lucide-react";
 import { useState } from "react";
 import type { Connection, ConnectionDetails } from "@contracts/connections";
 import { ConnectionQr } from "./QrCodeDialog.js";
 
+async function writeToClipboard(value: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Plain-HTTP Umbrel origins cannot use the secure-context Clipboard API.
+  }
+
+  try {
+    return copyToClipboard(value);
+  } catch {
+    return false;
+  }
+}
+
 function CopyRow({ label, value, copyLabel }: { label: string; value: string; copyLabel: string }) {
   const [feedback, setFeedback] = useState<"" | "Copied!" | "Copy failed">("");
 
   async function copy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setFeedback("Copied!");
-    } catch {
-      setFeedback("Copy failed");
-    }
+    setFeedback(await writeToClipboard(value) ? "Copied!" : "Copy failed");
     window.setTimeout(() => setFeedback(""), 900);
   }
 

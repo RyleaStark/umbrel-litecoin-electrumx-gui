@@ -1,12 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectionPanel } from "./ConnectionPanel.js";
 
 const details = {
   local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" as const },
   tor: { address: "electrumx.example.onion", port: 51003, connectionString: "electrumx.example.onion:51003:t", transport: "tcp" as const }
 };
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined, writable: true });
+  Object.defineProperty(document, "execCommand", { configurable: true, value: undefined, writable: true });
+});
 
 describe("ConnectionPanel", () => {
   it("switches between distinct Local and Tor endpoints", async () => {
@@ -24,6 +30,32 @@ describe("ConnectionPanel", () => {
     expect(image.getAttribute("src")).toMatch(/^data:image\/svg\+xml/);
   });
 
+  it("copies every public wallet field without the secure Clipboard API", async () => {
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined, writable: true });
+    const copied: string[] = [];
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      value: vi.fn((command: string) => {
+        if (command !== "copy") return false;
+        copied.push(window.getSelection()?.toString() ?? "");
+        return true;
+      }),
+      writable: true,
+    });
+
+    render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+
+    for (const copyLabel of ["Copy address", "Copy port", "Copy connection string"]) {
+      await userEvent.click(screen.getByRole("button", { name: copyLabel }));
+    }
+
+    expect(copied).toEqual(["umbrel.local", "51003", "umbrel.local:51003:t"]);
+    expect(screen.getAllByText("Copied!")).toHaveLength(3);
+    expect(screen.queryByText("8000")).not.toBeInTheDocument();
+    expect(copied).not.toContain("8000");
+  });
+
   it("copies the complete wallet connection string", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });
@@ -34,8 +66,39 @@ describe("ConnectionPanel", () => {
     expect(screen.getByText("Copied!")).toBeInTheDocument();
   });
 
+  it("falls back to DOM copy when the secure Clipboard API rejects", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("private clipboard detail"));
+    Object.assign(navigator, { clipboard: { writeText } });
+    const copied: string[] = [];
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      value: vi.fn((command: string) => {
+        if (command !== "copy") return false;
+        copied.push(window.getSelection()?.toString() ?? "");
+        return true;
+      }),
+      writable: true,
+    });
+
+    render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy address" }));
+
+    expect(writeText).toHaveBeenCalledWith("umbrel.local");
+    expect(copied).toEqual(["umbrel.local"]);
+    expect(screen.getByText("Copied!")).toBeInTheDocument();
+    expect(screen.queryByText(/private clipboard detail/i)).not.toBeInTheDocument();
+  });
+
   it("reports a clipboard failure without exposing an internal error", async () => {
     Object.assign(navigator, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error("private clipboard detail")) } });
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      value: vi.fn(() => false),
+      writable: true,
+    });
+    vi.spyOn(window, "prompt").mockReturnValue(null);
+
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy address" }));
