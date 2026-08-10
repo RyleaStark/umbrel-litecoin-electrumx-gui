@@ -198,17 +198,40 @@ button { color: inherit; }
   background: linear-gradient(145deg, rgb(19 119 231 / 23%), rgb(19 119 231 / 5%));
   box-shadow: 0 0 28px rgb(19 119 231 / 12%), inset 0 1px rgb(255 255 255 / 8%);
 }
-.index-art.is-syncing .index-block {
-  animation: index-progress-pulse 2.4s ease-in-out infinite;
-  animation-delay: calc(var(--pulse-index) * 120ms);
+.index-block-complete,
+.index-block-pulse-fade,
+.index-block-pulse {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
 }
-.index-art.is-complete .index-block {
-  border-color: var(--brand);
+.index-block-complete {
+  z-index: 1;
+  border: 1px solid var(--brand);
+  opacity: 0;
   background: var(--brand);
   box-shadow: 0 0 28px rgb(19 119 231 / 25%), inset 0 1px rgb(255 255 255 / 22%);
-  filter: brightness(1);
-  animation: none;
+  transition: opacity 220ms ease-out;
 }
+.index-block-pulse-fade {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+}
+.index-block-pulse {
+  inset: 0;
+  border: 1px solid rgb(19 119 231 / 0%);
+  background: linear-gradient(145deg, rgb(19 119 231 / 0%), rgb(19 119 231 / 0%));
+  box-shadow: 0 0 0 rgb(19 119 231 / 0%), inset 0 1px rgb(255 255 255 / 0%);
+  animation: index-progress-pulse 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--pulse-index) * 120ms);
+  animation-play-state: paused;
+}
+.index-art.is-syncing .index-block-pulse-fade { opacity: 1; }
+.index-art.is-syncing .index-block-pulse { animation-play-state: running; }
+.index-art:not(.is-syncing):not(.is-complete) .index-block-pulse { animation-name: none; }
+.index-art.is-complete .index-block-complete { opacity: 1; }
 .sync-copy { position: absolute; z-index: 2; right: 5%; bottom: 7%; left: 5%; }
 .sync-copy > p { margin: 0 0 4px; color: rgb(255 255 255 / 50%); font-size: 14px; }
 .sync-title-row { display: flex; align-items: baseline; gap: 8px; }
@@ -321,11 +344,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 @keyframes loading { from { transform: translateX(-20%); } to { transform: translateX(160%); } }
 @keyframes index-progress-pulse {
   0%, 42%, 100% {
-    transform: translateY(var(--block-y)) scale(1);
+    transform: scale(1);
     filter: brightness(1);
   }
   14% {
-    transform: translateY(var(--block-y)) scale(1.055);
+    transform: scale(1.055);
     filter: brightness(1.65);
     border-color: rgb(19 119 231 / 72%);
     background: linear-gradient(145deg, rgb(19 119 231 / 42%), rgb(19 119 231 / 12%));
@@ -372,4 +395,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .index-art .index-block { transform: none !important; filter: none !important; animation: none !important; }
+  .index-art .index-block-complete, .index-art .index-block-pulse-fade { transition: none !important; }
+  .index-art .index-block-pulse-fade { opacity: 0 !important; }
+  .index-art .index-block-pulse { animation-name: none !important; transform: none !important; filter: none !important; }
 }
