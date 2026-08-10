@@ -1,0 +1,30 @@
+import QRCode from "qrcode";
+import { useEffect, useState } from "react";
+
+export function ConnectionQr({ value }: { value: string }) {
+  const [source, setSource] = useState<string | null>(null);
+  const hideBadge = value.length > 48;
+
+  useEffect(() => {
+    let active = true;
+    void QRCode.toString(value, {
+      type: "svg",
+      width: 224,
+      margin: 1,
+      color: { dark: "#1377E7", light: "#00000000" },
+      errorCorrectionLevel: "H",
+    }).then((svg) => {
+      if (active) setSource(`data:image/svg+xml,${encodeURIComponent(svg)}`);
+    });
+    return () => { active = false; };
+  }, [value]);
+
+  return (
+    <div className="connection-qr">
+      {source
+        ? <img src={source} alt={`QR code for ${value}`} />
+        : <div className="qr-placeholder" aria-label="Generating QR code" />}
+      <span className={`qr-brand${hideBadge ? " qr-brand-hidden" : ""}`} aria-hidden="true"><img src="/icon.png" alt="" /></span>
+    </div>
+  );
+}
