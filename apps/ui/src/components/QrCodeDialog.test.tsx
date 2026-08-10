@@ -4,10 +4,10 @@ import { ConnectionQr } from "./QrCodeDialog.js";
 
 describe("ConnectionQr", () => {
   it("keeps the product badge visible for Local and Tor payloads", () => {
-    const { container, rerender } = render(<ConnectionQr value="10.21.25.220:51003:t" />);
+    const { container, rerender } = render(<ConnectionQr value="10.21.25.220:51003" />);
     expect(container.querySelector(".qr-brand")).not.toHaveClass("qr-brand-hidden");
 
-    rerender(<ConnectionQr value={`${"a".repeat(62)}.onion:51003:t`} />);
+    rerender(<ConnectionQr value={`${"a".repeat(62)}.onion:51003`} />);
     expect(container.querySelector(".qr-brand")).not.toHaveClass("qr-brand-hidden");
   });
 });

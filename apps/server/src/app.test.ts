@@ -8,8 +8,8 @@ const service = {
   },
   getConnections() {
     return {
-      local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" as const },
-      tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003:t", transport: "tcp" as const }
+      local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003", transport: "tcp" as const },
+      tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003", transport: "tcp" as const }
     };
   },
   async getLegacyVersion() { return "2.0.0"; },
@@ -82,8 +82,8 @@ describe("ElectrumX API", () => {
     expect((await zeroHeight.inject({ method: "GET", url: "/v1/electrumx/syncPercent" })).body).toBe("null");
     expect((await waiting.inject({ method: "GET", url: "/api/connections" })).json()).toEqual(service.getConnections());
     expect((await waiting.inject({ method: "GET", url: "/v1/electrumx/electrum-connection-details" })).json()).toEqual({
-      local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t" },
-      tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003:t" }
+      local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003" },
+      tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003" }
     });
   });
 

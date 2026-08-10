@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { createElectrumXGuiService } from "./electrumx-gui-service.js";
 
 const connections = {
-  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" as const },
-  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003:t", transport: "tcp" as const }
+  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003", transport: "tcp" as const },
+  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003", transport: "tcp" as const }
 };
 
 describe("ElectrumXGuiService", () => {

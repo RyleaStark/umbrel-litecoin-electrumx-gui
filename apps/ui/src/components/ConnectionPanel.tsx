@@ -68,8 +68,8 @@ function ConnectionBody({ connection, network }: { connection: Connection; netwo
           <div className="connection-field-group">
             <CopyRow label="Address" value={connection.address} copyLabel="Copy address" />
             <CopyRow label="Port" value={String(connection.port)} copyLabel="Copy port" />
-            <StaticRow label="SSL" value="Disabled" />
             <CopyRow label="Connection string" value={connection.connectionString} copyLabel="Copy connection string" />
+            <StaticRow label="SSL" value="None" />
           </div>
           <p className="network-note">
             {network === "tor"

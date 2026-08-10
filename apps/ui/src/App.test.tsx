@@ -5,8 +5,8 @@ import { App } from "./App.js";
 
 const status = { state: "ready", version: "2.0.0", coreHeight: 110, indexedHeight: 110, percent: 100, message: "ElectrumX is synchronized" };
 const connections = {
-  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" },
-  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003:t", transport: "tcp" }
+  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003", transport: "tcp" },
+  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003", transport: "tcp" }
 };
 
 afterEach(() => vi.unstubAllGlobals());

@@ -32,7 +32,7 @@ export function createConnectionDetails(input: { localHost: string; torHost: str
   const makeConnection = (address: string): Connection => ({
     address: validateHost(address),
     port,
-    connectionString: `${validateHost(address)}:${port}:t`,
+    connectionString: `${validateHost(address)}:${port}`,
     transport: "tcp",
   });
 

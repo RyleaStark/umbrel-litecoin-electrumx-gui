@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { Dashboard } from "./Dashboard.js";
 
 const connections = {
-  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" as const },
-  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003:t", transport: "tcp" as const }
+  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003", transport: "tcp" as const },
+  tor: { address: "example.onion", port: 51003, connectionString: "example.onion:51003", transport: "tcp" as const }
 };
 
 describe("Dashboard", () => {

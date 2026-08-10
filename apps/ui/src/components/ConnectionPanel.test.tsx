@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectionPanel } from "./ConnectionPanel.js";
 
 const details = {
-  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003:t", transport: "tcp" as const },
-  tor: { address: "electrumx.example.onion", port: 51003, connectionString: "electrumx.example.onion:51003:t", transport: "tcp" as const }
+  local: { address: "umbrel.local", port: 51003, connectionString: "umbrel.local:51003", transport: "tcp" as const },
+  tor: { address: "electrumx.example.onion", port: 51003, connectionString: "electrumx.example.onion:51003", transport: "tcp" as const }
 };
 
 afterEach(() => {
@@ -26,8 +26,25 @@ describe("ConnectionPanel", () => {
   it("shows a QR code for the active wallet connection", async () => {
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
-    const image = await screen.findByRole("img", { name: "QR code for umbrel.local:51003:t" });
+    const image = await screen.findByRole("img", { name: "QR code for umbrel.local:51003" });
     expect(image.getAttribute("src")).toMatch(/^data:image\/svg\+xml/);
+    expect(image).not.toHaveAccessibleName(/:51003:[ts]$/u);
+  });
+
+  it("orders wallet fields before the exact SSL None row", async () => {
+    render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+    const rows = Array.from(document.querySelectorAll(".connection-row"), (row) =>
+      Array.from(row.querySelectorAll(".row-label, .row-value"), (cell) => cell.textContent),
+    );
+    expect(rows).toEqual([
+      ["Address", "umbrel.local"],
+      ["Port", "51003"],
+      ["Connection string", "umbrel.local:51003"],
+      ["SSL", "None"],
+    ]);
+    expect(document.body.textContent).not.toContain("8000");
+    expect(document.body.textContent).not.toContain("😒");
   });
 
   it("copies every public wallet field without the secure Clipboard API", async () => {
@@ -50,7 +67,7 @@ describe("ConnectionPanel", () => {
       await userEvent.click(screen.getByRole("button", { name: copyLabel }));
     }
 
-    expect(copied).toEqual(["umbrel.local", "51003", "umbrel.local:51003:t"]);
+    expect(copied).toEqual(["umbrel.local", "51003", "umbrel.local:51003"]);
     expect(screen.getAllByText("Copied!")).toHaveLength(3);
     expect(screen.queryByText("8000")).not.toBeInTheDocument();
     expect(copied).not.toContain("8000");
@@ -62,7 +79,7 @@ describe("ConnectionPanel", () => {
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy connection string" }));
-    expect(writeText).toHaveBeenCalledWith("umbrel.local:51003:t");
+    expect(writeText).toHaveBeenCalledWith("umbrel.local:51003");
     expect(screen.getByText("Copied!")).toBeInTheDocument();
   });
 
