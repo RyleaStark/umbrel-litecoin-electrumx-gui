@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { createServer, type Server, type Socket } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
-import { createElectrumXClient } from "./electrumx-client.js";
+import { createElectrumXClient, createElectrumXPublicClient } from "./electrumx-client.js";
 
 const servers: Server[] = [];
 const sockets = new Set<Socket>();
@@ -61,5 +61,33 @@ describe("ElectrumXClient", () => {
   it("preserves the legacy unknown fallback for an unversioned banner", async () => {
     const port = await fakeAdmin(() => ({ version: "ElectrumX", "db height": 1, "daemon height": 1 }));
     await expect(createElectrumXClient({ host: "127.0.0.1", port, timeoutMs: 500 }).getInfo()).resolves.toMatchObject({ version: "unknown" });
+  });
+
+  it("accepts the provider's legitimate minus-one empty-database height", async () => {
+    const port = await fakeAdmin(() => ({ version: "ElectrumX 2.0.0", "db height": -1, "daemon height": 0 }));
+    await expect(createElectrumXClient({ host: "127.0.0.1", port, timeoutMs: 500 }).getInfo()).resolves.toMatchObject({
+      dbHeight: -1,
+      daemonHeight: 0,
+    });
+  });
+
+  it.each([
+    ["missing DB height", { version: "ElectrumX 2.0.0", "daemon height": 1 }],
+    ["missing daemon height", { version: "ElectrumX 2.0.0", "db height": 1 }],
+    ["malformed DB height", { version: "ElectrumX 2.0.0", "db height": "1", "daemon height": 1 }],
+    ["negative daemon height", { version: "ElectrumX 2.0.0", "db height": 0, "daemon height": -1 }],
+  ])("rejects %s in getinfo", async (_label, result) => {
+    const port = await fakeAdmin(() => result);
+    await expect(createElectrumXClient({ host: "127.0.0.1", port, timeoutMs: 500 }).getInfo()).rejects.toThrow();
+  });
+
+  it("proves public-listener readiness with the Electrum server.version method", async () => {
+    const port = await fakeAdmin(({ method, params }) => {
+      expect(method).toBe("server.version");
+      expect(params).toEqual(["umbrel", "1.4"]);
+      return ["ElectrumX 2.0.0", "1.4"];
+    });
+
+    await expect(createElectrumXPublicClient({ host: "127.0.0.1", port, timeoutMs: 500 }).isReady()).resolves.toBe(true);
   });
 });

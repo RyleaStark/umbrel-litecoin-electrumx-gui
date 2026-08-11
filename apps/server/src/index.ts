@@ -1,7 +1,7 @@
 import { createConnectionDetails } from "../../../packages/contracts/src/connections.js";
 import { buildApp } from "./app.js";
 import { readConfig } from "./config.js";
-import { createElectrumXClient } from "./electrumx-client.js";
+import { createElectrumXClient, createElectrumXPublicClient } from "./electrumx-client.js";
 import { createElectrumXGuiService } from "./electrumx-gui-service.js";
 import { createLitecoinCoreClient } from "./litecoin-core-client.js";
 
@@ -9,6 +9,7 @@ const config = readConfig(process.env);
 const service = createElectrumXGuiService({
   core: createLitecoinCoreClient(config.core),
   electrumx: createElectrumXClient(config.electrumx),
+  publicElectrum: createElectrumXPublicClient({ host: config.electrumx.host, port: config.connections.port }),
   connections: createConnectionDetails(config.connections),
 });
 const app = buildApp({ service });
