@@ -273,15 +273,22 @@ button { color: inherit; }
   top: 50%;
   left: 50%;
   width: min(calc(100% - 32px), 768px);
-  max-height: 90vh;
-  overflow: auto;
+  max-height: 90dvh;
+  overflow: hidden;
   transform: translate(-50%, -50%);
   border: 0.5px solid var(--border);
   border-radius: 16px;
-  padding: 24px;
+  padding: 0;
   background: linear-gradient(180deg, var(--card-top), var(--card-bottom));
   box-shadow: 0 28px 100px rgb(0 0 0 / 60%);
   animation: dialog-in 200ms ease-out;
+}
+.connection-dialog-scroll {
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+  -webkit-overflow-scrolling: touch;
 }
 .dialog-header { margin-bottom: 20px; text-align: left; }
 .dialog-header h2 { display: flex; align-items: center; gap: 9px; margin: 0; font-family: "Outfit Variable", sans-serif; font-size: 20px; font-weight: 400; }
@@ -375,7 +382,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 }
 
 @media (max-width: 639px) {
-  .connection-dialog { padding: 22px 18px 18px; }
+  .connection-dialog-scroll { padding: 22px 18px 18px; }
   .connection-modal-grid { flex-direction: column; }
   .connection-type-card { width: 100%; flex: none; }
   .connection-field-group { width: 100%; }
