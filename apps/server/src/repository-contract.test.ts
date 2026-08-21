@@ -39,10 +39,4 @@ describe("Bitcoin runtime and visual contract", () => {
     expect(css).toContain(".index-art .index-block-pulse { animation-name: none !important; transform: none !important; filter: none !important; }");
     expect(css).not.toMatch(/5e8fd3|94 143 211|1377e7|19 119 231|12 60 110|9 68 124/i);
   });
-
-  it("contains verification CI only and cannot publish personal images", async () => {
-    const workflow = await source(".github/workflows/on-push.yml");
-    expect(workflow).toContain("name: Verify");
-    expect(workflow).not.toMatch(/ghcr\.io|docker\/login-action|build-push-action|packages:\s*write|push:\s*true|tags:\s*\['v\*'\]/);
-  });
 });

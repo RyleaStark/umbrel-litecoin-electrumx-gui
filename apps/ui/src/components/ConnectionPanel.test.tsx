@@ -65,10 +65,10 @@ describe("ConnectionPanel", () => {
 
     for (const copyLabel of ["Copy address", "Copy port", "Copy connection string"]) {
       await userEvent.click(screen.getByRole("button", { name: copyLabel }));
+      expect(screen.getByRole("button", { name: copyLabel }).parentElement).toHaveTextContent("Copied!");
     }
 
     expect(copied).toEqual(["umbrel.local", "50001", "umbrel.local:50001"]);
-    expect(screen.getAllByText("Copied!")).toHaveLength(3);
     expect(screen.queryByText("8000")).not.toBeInTheDocument();
     expect(copied).not.toContain("8000");
   });
