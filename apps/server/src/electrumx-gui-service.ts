@@ -37,7 +37,6 @@ export function createElectrumXGuiService({ core, electrumx, publicElectrum, con
     async getLegacySyncPercent() {
       try {
         const coreInfo = await core.getBlockchainInfo();
-        if (coreInfo.initialblockdownload) return -1;
         if (requiredCoreIndexes.some((name) => !coreInfo.indexes[name]?.synced)) return -1;
         const info = await electrumx.getInfo();
         if (info.dbHeight < -1 || info.dbHeight > info.daemonHeight) return -2;
@@ -53,9 +52,6 @@ export function createElectrumXGuiService({ core, electrumx, publicElectrum, con
         coreInfo = await core.getBlockchainInfo();
       } catch {
         return { state: "degraded", version: null, coreHeight: null, indexedHeight: null, percent: null, message: "Bitcoin Core is unavailable" };
-      }
-      if (coreInfo.initialblockdownload) {
-        return deriveIndexerStatus({ coreHeight: coreInfo.blocks, indexedHeight: null, targetHeight: null, initialBlockDownload: true, version: null });
       }
       if (requiredCoreIndexes.some((name) => !coreInfo.indexes[name])) {
         return { state: "degraded", version: null, coreHeight: coreInfo.blocks, indexedHeight: null, percent: null, message: "Bitcoin Core required indexes are unavailable" };

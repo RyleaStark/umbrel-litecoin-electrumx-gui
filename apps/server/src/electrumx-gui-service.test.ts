@@ -13,17 +13,23 @@ const syncedIndexes = {
 };
 
 describe("ElectrumXGuiService", () => {
-  it("waits for Bitcoin Core without querying ElectrumX during IBD", async () => {
-    const getInfo = vi.fn();
+  it("reports ElectrumX progress during Core IBD once required indexes are synchronized", async () => {
+    const getInfo = vi.fn(async () => ({ version: "2.0.0", dbHeight: 40, daemonHeight: 80 }));
     const service = createElectrumXGuiService({
       core: { getBlockchainInfo: async () => ({ blocks: 80, initialblockdownload: true, indexes: syncedIndexes }) },
       electrumx: { getInfo },
       connections
     });
 
-    expect(await service.getStatus()).toMatchObject({ state: "waiting-for-core", coreHeight: 80 });
-    expect(await service.getLegacySyncPercent()).toBe(-1);
-    expect(getInfo).not.toHaveBeenCalled();
+    expect(await service.getStatus()).toMatchObject({
+      state: "indexing",
+      version: "2.0.0",
+      coreHeight: 80,
+      indexedHeight: 40,
+      percent: 50,
+    });
+    expect(await service.getLegacySyncPercent()).toBe(50);
+    expect(getInfo).toHaveBeenCalledTimes(2);
   });
 
   it("returns an accurate synchronized status", async () => {
@@ -49,7 +55,7 @@ describe("ElectrumXGuiService", () => {
 
   it("keeps caught-up admin data in finalizing until the public Electrum listener answers", async () => {
     const service = createElectrumXGuiService({
-      core: { getBlockchainInfo: async () => ({ blocks: 110, initialblockdownload: false, indexes: syncedIndexes }) },
+      core: { getBlockchainInfo: async () => ({ blocks: 110, initialblockdownload: true, indexes: syncedIndexes }) },
       electrumx: { getInfo: async () => ({ version: "2.0.0", dbHeight: 110, daemonHeight: 110 }) },
       publicElectrum: { isReady: async () => false },
       connections,
@@ -64,9 +70,10 @@ describe("ElectrumXGuiService", () => {
   });
 
   it("degrades safely when Bitcoin Core is unavailable", async () => {
+    const getInfo = vi.fn();
     const service = createElectrumXGuiService({
       core: { getBlockchainInfo: async () => { throw new Error("rpcuser:secret"); } },
-      electrumx: { getInfo: vi.fn() },
+      electrumx: { getInfo },
       connections
     });
 
@@ -78,6 +85,8 @@ describe("ElectrumXGuiService", () => {
       percent: null,
       message: "Bitcoin Core is unavailable"
     });
+    expect(await service.getLegacySyncPercent()).toBe(-2);
+    expect(getInfo).not.toHaveBeenCalled();
   });
 
   it("reports connecting and preserves the legacy unavailable sentinel", async () => {
@@ -147,7 +156,7 @@ describe("ElectrumXGuiService", () => {
     const service = createElectrumXGuiService({
       core: { getBlockchainInfo: async () => ({
         blocks: 110,
-        initialblockdownload: false,
+        initialblockdownload: true,
         indexes: {
           txindex: { synced: false, bestBlockHeight: 90 },
           txospenderindex: { synced: true, bestBlockHeight: 110 },
@@ -164,6 +173,29 @@ describe("ElectrumXGuiService", () => {
       percent: null,
       message: "Waiting for Bitcoin Core indexes",
     });
+    expect(getInfo).not.toHaveBeenCalled();
+  });
+
+  it("degrades safely when a required Core index is unavailable during IBD", async () => {
+    const getInfo = vi.fn();
+    const service = createElectrumXGuiService({
+      core: { getBlockchainInfo: async () => ({
+        blocks: 110,
+        initialblockdownload: true,
+        indexes: { txindex: { synced: true, bestBlockHeight: 110 } },
+      }) },
+      electrumx: { getInfo },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({
+      state: "degraded",
+      coreHeight: 110,
+      indexedHeight: null,
+      percent: null,
+      message: "Bitcoin Core required indexes are unavailable",
+    });
+    expect(await service.getLegacySyncPercent()).toBe(-1);
     expect(getInfo).not.toHaveBeenCalled();
   });
 
