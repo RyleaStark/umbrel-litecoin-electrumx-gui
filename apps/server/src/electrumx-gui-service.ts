@@ -30,16 +30,20 @@ export function createElectrumXGuiService({ core, electrumx, publicElectrum, con
     getConnections: () => connections,
     async getLegacyVersion() { return (await electrumx.getInfo()).version; },
     async getLegacySyncPercent() {
+      let coreInfo: { blocks: number; initialblockdownload: boolean };
       try {
-        const coreInfo = await core.getBlockchainInfo();
-        if (coreInfo.initialblockdownload) return -1;
+        coreInfo = await core.getBlockchainInfo();
+      } catch {
+        return -2;
+      }
+      try {
         const info = await electrumx.getInfo();
         if (!validHeights(info)) return -2;
         if (info.dbHeight === -1) return 0;
         if (info.daemonHeight === 0) return 0;
         return Math.ceil((info.dbHeight / info.daemonHeight) * 100);
       } catch {
-        return -2;
+        return coreInfo.initialblockdownload ? -1 : -2;
       }
     },
     async getStatus(): Promise<IndexerStatus> {
@@ -48,9 +52,6 @@ export function createElectrumXGuiService({ core, electrumx, publicElectrum, con
         coreInfo = await core.getBlockchainInfo();
       } catch {
         return { state: "degraded", version: null, coreHeight: null, indexedHeight: null, percent: null, message: "Litecoin Core is unavailable" };
-      }
-      if (coreInfo.initialblockdownload) {
-        return deriveIndexerStatus({ coreHeight: coreInfo.blocks, indexedHeight: null, initialBlockDownload: true, version: null });
       }
       try {
         const info = await electrumx.getInfo();
@@ -87,7 +88,9 @@ export function createElectrumXGuiService({ core, electrumx, publicElectrum, con
               : "Indexing Litecoin transaction history",
         };
       } catch {
-        return connectingStatus(coreInfo.blocks);
+        return coreInfo.initialblockdownload
+          ? deriveIndexerStatus({ coreHeight: coreInfo.blocks, indexedHeight: null, initialBlockDownload: true, version: null })
+          : connectingStatus(coreInfo.blocks);
       }
     },
   };

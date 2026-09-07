@@ -8,18 +8,60 @@ const connections = {
 };
 
 describe("ElectrumXGuiService", () => {
-  it("waits for Litecoin Core without querying ElectrumX during IBD", async () => {
-    const getInfo = vi.fn();
+  it("reports ElectrumX indexing progress while Litecoin Core is in IBD", async () => {
+    const getInfo = vi.fn(async () => ({ version: "2.0.0", dbHeight: 25, daemonHeight: 100 }));
     const service = createElectrumXGuiService({
-      core: { getBlockchainInfo: async () => ({ blocks: 80, initialblockdownload: true }) },
+      core: { getBlockchainInfo: async () => ({ blocks: 100, initialblockdownload: true }) },
       electrumx: { getInfo },
       publicElectrum: { isReady: vi.fn() },
       connections
     });
 
-    expect(await service.getStatus()).toMatchObject({ state: "waiting-for-core", coreHeight: 80 });
+    expect(await service.getStatus()).toEqual({
+      state: "indexing",
+      version: "2.0.0",
+      coreHeight: 100,
+      indexedHeight: 25,
+      percent: 25,
+      message: "Indexing Litecoin transaction history"
+    });
+    expect(await service.getLegacySyncPercent()).toBe(25);
+    expect(getInfo).toHaveBeenCalledTimes(2);
+  });
+
+  it("uses ElectrumX public-listener readiness while Litecoin Core is in IBD", async () => {
+    const publicReady = vi.fn(async () => true);
+    const service = createElectrumXGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 100, initialblockdownload: true }) },
+      electrumx: { getInfo: async () => ({ version: "2.0.0", dbHeight: 100, daemonHeight: 100 }) },
+      publicElectrum: { isReady: publicReady },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({
+      state: "ready",
+      version: "2.0.0",
+      indexedHeight: 100,
+      percent: 100,
+    });
+    expect(publicReady).toHaveBeenCalledOnce();
+  });
+
+  it("falls back to waiting for Core when ElectrumX is unavailable during IBD", async () => {
+    const service = createElectrumXGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 80, initialblockdownload: true }) },
+      electrumx: { getInfo: async () => { throw new Error("not ready"); } },
+      publicElectrum: { isReady: vi.fn() },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({
+      state: "waiting-for-core",
+      coreHeight: 80,
+      indexedHeight: null,
+      percent: null,
+    });
     expect(await service.getLegacySyncPercent()).toBe(-1);
-    expect(getInfo).not.toHaveBeenCalled();
   });
 
   it("returns an accurate synchronized status", async () => {
